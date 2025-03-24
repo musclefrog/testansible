@@ -1,0 +1,20 @@
+- name: Restart httpd when ports change
+  hosts: all
+  become: true
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Change Apache Listen port
+      lineinfile:
+        path: /etc/httpd/conf/httpd.conf
+        regexp: '^Listen [0-9]{1,5}$'
+        line: "Listen {{ webport }}"
+      notify:
+        - Restart httpd
+
+  handlers:
+    - name: Restart httpd
+      service:
+        name: httpd
+        state: restarted
